@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#000000" />
+    <title>律动星轨</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='%230a84ff'/%3E%3Crect x='13' y='30' width='8' height='20' rx='4' fill='%23fff'/%3E%3Crect x='24' y='14' width='8' height='36' rx='4' fill='%23fff'/%3E%3Crect x='35' y='22' width='8' height='28' rx='4' fill='%23fff'/%3E%3Crect x='46' y='34' width='8' height='16' rx='4' fill='%23fff'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="css/tokens.css" />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <!-- 标题页 -->
+      <section class="screen active" id="scr-title">
+        <div class="rain" aria-hidden="true">
+          <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <div class="title-box">
+          <svg class="logo" viewBox="0 0 64 64" width="84" height="84" aria-hidden="true">
+            <rect width="64" height="64" rx="15" fill="var(--primary)" />
+            <rect x="13" y="30" width="8" height="20" rx="4" fill="#fff" />
+            <rect x="24" y="14" width="8" height="36" rx="4" fill="#fff" />
+            <rect x="35" y="22" width="8" height="28" rx="4" fill="#fff" />
+            <rect x="46" y="34" width="8" height="16" rx="4" fill="#fff" />
+          </svg>
+          <h1>律动星轨</h1>
+          <p class="tagline">跟着经典旋律，敲出你的节拍</p>
+          <button class="btn btn-primary btn-xl" id="btn-enter">开始游戏</button>
+          <p class="hint">键盘 <kbd>D</kbd><kbd>F</kbd><kbd>J</kbd><kbd>K</kbd> 击打 · <kbd>空格</kbd> 释放 Fever · 手机直接点击轨道</p>
+        </div>
+      </section>
+
+      <!-- 选歌页 -->
+      <section class="screen" id="scr-select">
+        <header class="topbar">
+          <div class="brand">
+            <svg viewBox="0 0 64 64" width="28" height="28" aria-hidden="true">
+              <rect width="64" height="64" rx="15" fill="var(--primary)" />
+              <rect x="13" y="30" width="8" height="20" rx="4" fill="#fff" />
+              <rect x="24" y="14" width="8" height="36" rx="4" fill="#fff" />
+              <rect x="35" y="22" width="8" height="28" rx="4" fill="#fff" />
+              <rect x="46" y="34" width="8" height="16" rx="4" fill="#fff" />
+            </svg>
+            <span>律动星轨</span>
+          </div>
+          <div class="topbar-actions">
+            <button class="btn" id="btn-help">玩法说明</button>
+            <button class="btn" id="btn-settings">设置</button>
+          </div>
+        </header>
+        <div class="select-wrap">
+          <div class="card list-card">
+            <div class="card-title">曲目 <span class="muted tabular" id="song-count"></span></div>
+            <div class="song-list" id="song-list"></div>
+          </div>
+          <div class="card detail-card" id="detail">
+            <div class="detail-head">
+              <div class="cover" id="d-cover"></div>
+              <div class="detail-names">
+                <h2 id="d-title"></h2>
+                <p class="muted" id="d-sub"></p>
+              </div>
+            </div>
+            <div class="meta">
+              <div><span class="muted">速度</span><b class="tabular" id="d-bpm"></b></div>
+              <div><span class="muted">时长</span><b class="tabular" id="d-len"></b></div>
+              <div><span class="muted">音符</span><b class="tabular" id="d-notes"></b></div>
+            </div>
+            <div class="label">难度</div>
+            <div class="seg" id="d-diff"></div>
+            <div class="label">最佳成绩</div>
+            <div class="best" id="d-best"></div>
+            <div class="detail-actions">
+              <button class="btn btn-primary btn-lg" id="btn-play">开始演奏</button>
+              <button class="btn btn-lg" id="btn-auto">自动演示</button>
+            </div>
+            <p class="hint small">↑ ↓ 选歌 · ← → 换难度 · Enter 开始</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 游戏舞台 -->
+      <section class="screen" id="scr-stage">
+        <canvas id="cv"></canvas>
+        <button class="pause-btn" id="btn-pause" aria-label="暂停">
+          <svg viewBox="0 0 24 24" width="18" height="18"><rect x="6" y="5" width="4" height="14" rx="1.5" fill="currentColor" /><rect x="14" y="5" width="4" height="14" rx="1.5" fill="currentColor" /></svg>
+        </button>
+        <div class="countdown" id="countdown" hidden></div>
+      </section>
+
+      <!-- 结算页 -->
+      <section class="screen" id="scr-result">
+        <div class="card result-card">
+          <div class="result-top">
+            <div class="grade" id="r-grade">S</div>
+            <div class="result-names">
+              <h2 id="r-title"></h2>
+              <p class="muted" id="r-sub"></p>
+              <div class="badges" id="r-badges"></div>
+            </div>
+          </div>
+          <div class="result-score">
+            <span class="muted">总分</span>
+            <b class="tabular" id="r-score">0</b>
+          </div>
+          <div class="meta">
+            <div><span class="muted">准确率</span><b class="tabular" id="r-acc"></b></div>
+            <div><span class="muted">最大连击</span><b class="tabular" id="r-combo"></b></div>
+            <div><span class="muted">早 / 晚</span><b class="tabular" id="r-el"></b></div>
+          </div>
+          <div class="counts">
+            <div><i class="dot dot-perfect"></i>Perfect<b class="tabular" id="r-perfect"></b></div>
+            <div><i class="dot dot-great"></i>Great<b class="tabular" id="r-great"></b></div>
+            <div><i class="dot dot-good"></i>Good<b class="tabular" id="r-good"></b></div>
+            <div><i class="dot dot-miss"></i>Miss<b class="tabular" id="r-miss"></b></div>
+          </div>
+          <div class="detail-actions">
+            <button class="btn btn-primary btn-lg" id="btn-retry">再来一次</button>
+            <button class="btn btn-lg" id="btn-back">返回选歌</button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- 暂停 -->
+    <div class="modal-overlay" id="m-pause" hidden>
+      <div class="modal" style="width: 320px">
+        <div class="modal-header"><span>已暂停</span></div>
+        <div class="modal-body pause-actions">
+          <button class="btn btn-primary btn-lg" id="btn-resume">继续</button>
+          <button class="btn btn-lg" id="btn-restart">重新开始</button>
+          <button class="btn btn-lg" id="btn-quit">退出到选歌</button>
+        </div>
+        <div class="modal-footer"></div>
+      </div>
+    </div>
+
+    <!-- 设置 -->
+    <div class="modal-overlay" id="m-settings" hidden>
+      <div class="modal" style="width: 440px">
+        <div class="modal-header">
+          <span>设置</span>
+          <button class="modal-x" data-close aria-label="关闭">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="form">
+            <label class="form-row"><span class="form-label">下落速度</span><input type="range" id="s-speed" min="1" max="10" step="1" /><span class="val tabular" id="v-speed"></span></label>
+            <label class="form-row"><span class="form-label">判定偏移</span><input type="range" id="s-offset" min="-150" max="150" step="5" /><span class="val tabular" id="v-offset"></span></label>
+            <label class="form-row"><span class="form-label">音乐音量</span><input type="range" id="s-music" min="0" max="100" step="5" /><span class="val tabular" id="v-music"></span></label>
+            <label class="form-row"><span class="form-label">音效音量</span><input type="range" id="s-sfx" min="0" max="100" step="5" /><span class="val tabular" id="v-sfx"></span></label>
+            <label class="form-check"><input type="checkbox" id="s-hit" /><span>击打时播放打击音</span></label>
+            <p class="muted small">感觉总是"偏早"就把判定偏移调大（正数），总是"偏晚"就调小（负数）。蓝牙耳机通常需要 +100ms 以上。</p>
+          </div>
+        </div>
+        <div class="modal-footer"><button class="btn btn-primary" data-close>完成</button></div>
+      </div>
+    </div>
+
+    <!-- 玩法说明 -->
+    <div class="modal-overlay" id="m-help" hidden>
+      <div class="modal" style="width: 480px">
+        <div class="modal-header">
+          <span>玩法说明</span>
+          <button class="modal-x" data-close aria-label="关闭">✕</button>
+        </div>
+        <div class="modal-body help">
+          <p>音符顺着四条轨道落下，落到底部判定线的瞬间按下对应的键：</p>
+          <p class="keys"><kbd>D</kbd><kbd>F</kbd><kbd>J</kbd><kbd>K</kbd></p>
+          <ul>
+            <li><b>单点</b>：到线时按一下。彩色音符是主旋律，银色音符是伴奏节奏（仅困难）。</li>
+            <li><b>长按</b>：按住直到长条结束再松开，中途松手会断连击。</li>
+            <li><b>判定</b>：Perfect ±50ms、Great ±100ms、Good ±150ms。连击越高，单个音符得分越高（最高 2 倍）。</li>
+            <li><b>Fever</b>：连续命中会攒满能量槽，按 <kbd>空格</kbd> 释放，8 秒内得分再翻倍——留到音符最密的段落用最划算。</li>
+            <li><b>失误</b>：漏掉音符时主旋律会变弱，重新打中就回来了。</li>
+            <li><kbd>Esc</kbd> 暂停。手机 / 平板直接点击轨道即可。</li>
+          </ul>
+        </div>
+        <div class="modal-footer"><button class="btn btn-primary" data-close>知道了</button></div>
+      </div>
+    </div>
+
+    <script src="js/songs.js"></script>
+    <script src="js/music.js"></script>
+    <script src="js/chart.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "rhythm",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "5437", "--bind", "127.0.0.1"],
+      "port": 5437
+    }
+  ]
+}
